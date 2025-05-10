@@ -51,12 +51,22 @@ function CreateCampaign() {
     };
   };
 
+  const getAuthHeader = () => ({
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("jwt_token")}`,
+    },
+  });
+
   const handlePreview = async () => {
     try {
       setAudienceSize(null);
       setMessage("");
       const ruleTree = buildRuleTree();
-      const res = await axios.post("/api/segments/preview", { rule: ruleTree });
+      const res = await axios.post(
+        "/api/segments/preview",
+        { rule: ruleTree },
+        getAuthHeader()
+      );
       setAudienceSize(res.data.audience_size);
     } catch (err) {
       setMessage("Preview failed: " + (err.response?.data?.message || err.message));
@@ -68,10 +78,14 @@ function CreateCampaign() {
     setMessage("");
     try {
       const ruleTree = buildRuleTree();
-      await axios.post("/api/campaigns", {
-        name: campaignName,
-        rule: ruleTree,
-      });
+      await axios.post(
+        "/api/campaigns",
+        {
+          name: campaignName,
+          rule: ruleTree,
+        },
+        getAuthHeader()
+      );
       setSaving(false);
       setMessage("Campaign saved!");
       // Redirect after save:

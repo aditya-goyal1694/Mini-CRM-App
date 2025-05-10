@@ -2,11 +2,14 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 
+const authRoutes = require('./routes/auth');
 const customerRoutes = require('./routes/customer');
 const orderRoutes = require('./routes/order');
 const segmentsRoutes = require('./routes/segments');
 const campaignRoutes = require('./routes/campaign');
 const vendorRoutes = require('./routes/vendor');
+
+const authenticateJWT = require('./middleware/jwt');
 
 const setupSwagger = require('./docs/swagger');
 
@@ -23,12 +26,13 @@ app.use(cors());
 app.use(express.json());
 
 // API routes
-app.use('/api/customers', customerRoutes);
-app.use('/api/orders', orderRoutes);
-app.use('/api/segments', segmentsRoutes);
-app.use('/api/campaigns', campaignRoutes);
-app.use('/dummy', vendorRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/customers', authenticateJWT, customerRoutes);
+app.use('/api/orders', authenticateJWT, orderRoutes);
+app.use('/api/segments', authenticateJWT, segmentsRoutes);
+app.use('/api/campaigns', authenticateJWT, campaignRoutes);
 
+app.use('/dummy', vendorRoutes);
 
 setupSwagger(app);
 

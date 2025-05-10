@@ -8,7 +8,11 @@ export default function Campaigns() {
   useEffect(() => {
     async function fetchCampaigns() {
       try {
-        const res = await axios.get("/api/campaigns");
+        const res = await axios.get("/api/campaigns", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwt_token")}`,
+          },
+        });
         setCampaigns(res.data);
       } catch (err) {
         setCampaigns([]);
