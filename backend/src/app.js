@@ -6,6 +6,7 @@ const customerRoutes = require('./routes/customer');
 const orderRoutes = require('./routes/order');
 const segmentsRoutes = require('./routes/segments');
 const campaignRoutes = require('./routes/campaign');
+const vendorRoutes = require('./routes/vendor');
 
 const setupSwagger = require('./docs/swagger');
 
@@ -26,6 +27,7 @@ app.use('/api/customers', customerRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/segments', segmentsRoutes);
 app.use('/api/campaigns', campaignRoutes);
+app.use('/dummy', vendorRoutes);
 
 
 setupSwagger(app);

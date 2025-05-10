@@ -12,13 +12,18 @@ const sequelize = new Sequelize(
   }
 );
 
-// Import models
 const Customer = require('./customer')(sequelize);
 const Order = require('./order')(sequelize);
 const Campaign = require('./campaign')(sequelize);
+const CommunicationLog = require('./communicationLog')(sequelize);
 
-// Associations
 Customer.hasMany(Order, { foreignKey: 'customerId' });
 Order.belongsTo(Customer, { foreignKey: 'customerId' });
 
-module.exports = { sequelize, Customer, Order, Campaign };
+Campaign.hasMany(CommunicationLog, { foreignKey: 'campaign_id' });
+CommunicationLog.belongsTo(Campaign, { foreignKey: 'campaign_id' });
+
+Customer.hasMany(CommunicationLog, { foreignKey: 'customer_id' });
+CommunicationLog.belongsTo(Customer, { foreignKey: 'customer_id' });
+
+module.exports = { sequelize, Customer, Order, Campaign, CommunicationLog };
