@@ -2,18 +2,20 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 
-// Import routers
 const customerRoutes = require('./routes/customer');
 const orderRoutes = require('./routes/order');
+const segmentsRoutes = require('./routes/segments');
+const campaignRoutes = require('./routes/campaign');
+
 const setupSwagger = require('./docs/swagger');
 
 const { sequelize } = require('./models');
 
 // Sync models (creates tables if they don't exist)
 sequelize
-  .sync()
-  .then(() => console.log('Database connected!'))
-  .catch((err) => console.error('Sequelize sync error:', err));
+.sync()
+.then(() => console.log('Database connected!'))
+.catch((err) => console.error('Sequelize sync error:', err));
 
 const app = express();
 app.use(cors());
@@ -22,9 +24,10 @@ app.use(express.json());
 // API routes
 app.use('/api/customers', customerRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/segments', segmentsRoutes);
+app.use('/api/campaigns', campaignRoutes);
 
 
-// Swagger docs route
 setupSwagger(app);
 
 // Root route

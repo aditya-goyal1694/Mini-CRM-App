@@ -15,10 +15,10 @@ const sequelize = new Sequelize(
 // Import models
 const Customer = require('./customer')(sequelize);
 const Order = require('./order')(sequelize);
+const Campaign = require('./campaign')(sequelize);
 
 // Associations
 Customer.hasMany(Order, { foreignKey: 'customerId' });
 Order.belongsTo(Customer, { foreignKey: 'customerId' });
 
-// Export everything
-module.exports = { sequelize, Customer, Order };
+module.exports = { sequelize, Customer, Order, Campaign };
