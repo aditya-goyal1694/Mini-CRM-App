@@ -1,0 +1,144 @@
+openapi: 3.0.0
+info:
+  title: Mini CRM API
+  version: '1.0.0'
+  description: API docs for Mini CRM
+servers:
+  - url: http://localhost:8000
+
+components:
+  schemas:
+    Customer:
+      type: object
+      required:
+        - name
+        - email
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        last_purchase_date:
+          type: string
+          format: date-time
+        total_spend:
+          type: number
+        visits:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    Order:
+      type: object
+      required:
+        - customerId
+        - amount
+      properties:
+        id:
+          type: integer
+        customerId:
+          type: integer
+        amount:
+          type: number
+        order_date:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [PLACED, CANCELLED, FULFILLED]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+paths:
+  /api/customers:
+    post:
+      summary: Create a new customer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Customer'
+      responses:
+        201:
+          description: Customer created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        400:
+          description: Bad Request
+    get:
+      summary: Get all customers
+      responses:
+        200:
+          description: List of customers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Customer'
+
+  /api/orders:
+    post:
+      summary: Create a new order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
+      responses:
+        201:
+          description: Order created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        400:
+          description: Bad Request
+    get:
+      summary: Get all orders
+      responses:
+        200:
+          description: List of orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+
+  /api/orders/customer/{customerId}:
+    get:
+      summary: Get all orders for a specific customer
+      parameters:
+        - in: path
+          name: customerId
+          schema:
+            type: integer
+          required: true
+          description: The customer's ID
+      responses:
+        200:
+          description: List of orders for the customer
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+        404:
+          description: Customer not found
