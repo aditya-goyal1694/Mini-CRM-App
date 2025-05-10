@@ -8,6 +8,7 @@ const orderRoutes = require('./routes/order');
 const segmentsRoutes = require('./routes/segments');
 const campaignRoutes = require('./routes/campaign');
 const vendorRoutes = require('./routes/vendor');
+const aiRoutes = require('./routes/ai');
 
 const authenticateJWT = require('./middleware/jwt');
 
@@ -31,6 +32,7 @@ app.use('/api/customers', authenticateJWT, customerRoutes);
 app.use('/api/orders', authenticateJWT, orderRoutes);
 app.use('/api/segments', authenticateJWT, segmentsRoutes);
 app.use('/api/campaigns', authenticateJWT, campaignRoutes);
+app.use('/api/ai', aiRoutes);
 
 app.use('/dummy', vendorRoutes);
 

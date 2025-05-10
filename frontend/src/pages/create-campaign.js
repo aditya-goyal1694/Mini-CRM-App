@@ -26,6 +26,11 @@ function CreateCampaign() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
 
+  const [objective, setObjective] = useState('');
+  const [aiSuggestions, setAiSuggestions] = useState([]);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState('');
+
   const handleRuleChange = (idx, key, value) => {
     const updated = [...rules];
     updated[idx][key] = value;
@@ -189,6 +194,48 @@ function CreateCampaign() {
       {message && (
         <div className="mt-2 text-sm text-red-500">{message}</div>
       )}
+
+      <div className="mb-3">
+        <label className="block font-medium mb-1">Campaign Objective (for AI suggestions)</label>
+        <input
+          className="w-full border p-2 rounded"
+          type="text"
+          value={objective}
+          onChange={e => setObjective(e.target.value)}
+          placeholder="E.g., Bring back inactive users..."
+        />
+        <button
+          className="mt-2 bg-blue-600 text-white px-4 py-2 rounded"
+          disabled={!objective}
+          onClick={async () => {
+            setAiLoading(true); setAiError(''); setAiSuggestions([]);
+            try {
+              const res = await axios.post(
+                "/api/ai/suggest-messages",
+                { objective },
+                {
+                  headers: { Authorization: `Bearer ${localStorage.getItem("jwt_token")}` }
+                }
+              );
+              setAiSuggestions(res.data.suggestions);
+            } catch (e) {
+              setAiError("AI failed to suggest: " + (e.response?.data?.error || e.message));
+            } finally {
+              setAiLoading(false);
+            }
+          }}
+        >
+          {aiLoading ? "Generating..." : "Suggest Messages"}
+        </button>
+        {aiError && <div className="mt-2 text-sm text-red-500">{aiError}</div>}
+        {aiSuggestions.length > 0 && (
+          <ul className="mt-2 bg-gray-100 rounded p-2">
+            {aiSuggestions.map((s, i) => (
+              <li key={i} className="mb-2">{s}</li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }
