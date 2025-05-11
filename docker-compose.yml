@@ -6,8 +6,6 @@ services:
       - "8000:8000"
     env_file:
       - ./backend/.env
-    depends_on:
-      - mysql
     networks:
       - crm-net
 
@@ -19,24 +17,6 @@ services:
       - backend
     networks:
       - crm-net
-
-  mysql:
-    image: mysql:8
-    ports:
-      - "51103:51103"
-    environment:
-      MYSQL_ROOT_PASSWORD: JnmeULOeVRwiLjRWUPdSOlqFKMhCKtcm
-      MYSQL_DATABASE: railway
-      MYSQL_USER: user
-      MYSQL_PASSWORD: JnmeULOeVRwiLjRWUPdSOlqFKMhCKtcm
-      MYSQL_HOST: maglev.proxy.rlwy.net
-    volumes:
-      - mysql-data:/var/lib/mysql
-    networks:
-      - crm-net
-
-volumes:
-  mysql-data:
 
 networks:
   crm-net:
