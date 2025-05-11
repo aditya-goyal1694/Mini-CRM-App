@@ -1,6 +1,6 @@
-"use client"
+"use client";
 import React, { useEffect, useState } from "react";
-import Link from 'next/link';
+import Link from "next/link";
 import axios from "axios";
 
 export default function Campaigns() {
@@ -26,37 +26,40 @@ export default function Campaigns() {
   }, []);
 
   return (
-    <div className="max-w-3xl mx-auto mt-8 p-6 bg-white rounded shadow">
-      <h2 className="text-2xl font-bold mb-4">Campaign History</h2>
+    <div className="max-w-4xl mx-auto mt-10 px-6 py-8 bg-white rounded-2xl shadow-md border border-gray-200">
+      <h2 className="text-3xl font-bold text-gray-900 mb-6">📊 Campaign History</h2>
+
       {loading ? (
-        <div>Loading...</div>
+        <div className="text-gray-600">Loading...</div>
       ) : campaigns.length === 0 ? (
-        <div className="text-gray-500">No campaigns found.</div>
+        <div className="text-gray-500 italic">No campaigns found.</div>
       ) : (
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="px-4 py-2 text-left text-sm font-semibold">Name</th>
-              <th className="px-4 py-2 text-left text-sm font-semibold">Audience Size</th>
-              <th className="px-4 py-2 text-left text-sm font-semibold">Created</th>
-            </tr>
-          </thead>
-          <tbody>
-            {campaigns.map((c) => (
-              <tr key={c.id} className="border-t">
-                <td className="px-4 py-2">{c.name}</td>
-                <td className="px-4 py-2">{c.audience_size}</td>
-                <td className="px-4 py-2">{new Date(c.createdAt).toLocaleString()}</td>
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-sm text-left text-gray-800">
+            <thead className="bg-gray-100 text-gray-700">
+              <tr>
+                <th className="px-6 py-3 font-semibold">Name</th>
+                <th className="px-6 py-3 font-semibold">Audience Size</th>
+                <th className="px-6 py-3 font-semibold">Created</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {campaigns.map((c) => (
+                <tr key={c.id} className="hover:bg-gray-50 transition-colors">
+                  <td className="px-6 py-3">{c.name}</td>
+                  <td className="px-6 py-3">{c.audience_size}</td>
+                  <td className="px-6 py-3">{new Date(c.createdAt).toLocaleString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
 
-      <div className="mt-4">
+      <div className="mt-8 text-right">
         <Link
           href="/create-campaign"
-          className="bg-indigo-600 text-white px-4 py-2 rounded"
+          className="inline-block bg-indigo-600 text-white font-medium px-5 py-2.5 rounded-lg shadow hover:bg-indigo-700 transition"
         >
           + Create New Campaign
         </Link>

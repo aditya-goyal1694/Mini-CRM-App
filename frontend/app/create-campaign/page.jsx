@@ -46,13 +46,12 @@ function CreateCampaign() {
     setRules(rules.filter((_, i) => i !== idx));
   };
 
-  // Helper: Convert rules & logic to backend's JSON structure
   const buildRuleTree = () => {
     return {
       [logicType]: rules.map((r) => ({
         field: r.field,
         operator: r.operator,
-        value: r.field === "inactive_days" ? Number(r.value) : Number(r.value),
+        value: Number(r.value),
       })),
     };
   };
@@ -94,7 +93,6 @@ function CreateCampaign() {
       );
       setSaving(false);
       setMessage("Campaign saved!");
-      // Redirect after save:
       setTimeout(() => {
         window.location.href = "/campaigns";
       }, 1000);
@@ -105,35 +103,39 @@ function CreateCampaign() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto mt-8 p-6 bg-white rounded shadow">
-      <h2 className="text-2xl font-bold mb-4">Create Campaign</h2>
-      <div className="mb-3">
-        <label className="block font-medium mb-1">Campaign Name</label>
+    <div className="max-w-2xl mx-auto mt-10 p-6 bg-white rounded-2xl shadow-md">
+      <h2 className="text-3xl font-bold mb-6 text-gray-900">Create Campaign</h2>
+
+      <div className="mb-4">
+        <label className="block font-medium mb-1 text-gray-800">Campaign Name</label>
         <input
-          className="w-full border p-2 rounded"
+          className="w-full border border-gray-300 p-2 rounded text-gray-800 placeholder:text-gray-800"
           value={campaignName}
           onChange={(e) => setCampaignName(e.target.value)}
+          placeholder="Enter campaign name"
           required
         />
       </div>
-      <div className="mb-3">
-        <label className="block font-medium mb-1">Segment Logic</label>
+
+      <div className="mb-4">
+        <label className="block font-medium mb-1 text-gray-800">Segment Logic</label>
         <select
-          className="border p-2 rounded mr-2"
+          className="border border-gray-300 p-2 rounded mr-2 text-gray-800"
           value={logicType}
           onChange={(e) => setLogicType(e.target.value)}
         >
           <option value="and">AND</option>
           <option value="or">OR</option>
         </select>
-        <span className="text-sm text-gray-500">
+        <span className="text-sm text-gray-700">
           (Combine rules with <span className="font-bold">{logicType.toUpperCase()}</span>)
         </span>
       </div>
+
       {rules.map((rule, idx) => (
-        <div key={idx} className="flex gap-2 mb-2 items-center">
+        <div key={idx} className="flex flex-wrap gap-2 mb-2 items-center">
           <select
-            className="border p-2 rounded"
+            className="border border-gray-300 p-2 rounded text-gray-800"
             value={rule.field}
             onChange={(e) => handleRuleChange(idx, "field", e.target.value)}
           >
@@ -142,7 +144,7 @@ function CreateCampaign() {
             ))}
           </select>
           <select
-            className="border p-2 rounded"
+            className="border border-gray-300 p-2 rounded text-gray-800"
             value={rule.operator}
             onChange={(e) => handleRuleChange(idx, "operator", e.target.value)}
           >
@@ -151,7 +153,7 @@ function CreateCampaign() {
             ))}
           </select>
           <input
-            className="border p-2 rounded w-28"
+            className="border border-gray-300 p-2 rounded w-28 text-gray-800 placeholder:text-gray-800"
             type="number"
             value={rule.value}
             onChange={(e) => handleRuleChange(idx, "value", e.target.value)}
@@ -160,24 +162,29 @@ function CreateCampaign() {
           {rules.length > 1 &&
             <button
               type="button"
-              className="text-red-600"
+              className="text-red-600 text-sm"
               onClick={() => removeRule(idx)}
             >Remove</button>
           }
         </div>
       ))}
+
       <button
         type="button"
-        className="mb-3 px-3 py-2 bg-blue-100 border border-blue-400 rounded text-sm"
+        className="mb-4 px-3 py-2 bg-blue-100 border border-blue-400 rounded text-sm text-gray-800"
         onClick={addRule}
-      >+ Add Rule</button>
+      >
+        + Add Rule
+      </button>
 
-      <div className="mb-3">
+      <div className="mb-4">
         <button
           type="button"
-          className="bg-indigo-600 text-white px-4 py-2 rounded mr-3"
+          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded mr-3"
           onClick={handlePreview}
-        >Preview Audience</button>
+        >
+          Preview Audience
+        </button>
         {audienceSize !== null && (
           <span className="ml-3 text-green-700 font-semibold">
             Audience Size: {audienceSize}
@@ -186,27 +193,30 @@ function CreateCampaign() {
       </div>
 
       <button
-        className="bg-green-600 text-white px-5 py-2 rounded"
+        className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded"
         disabled={!campaignName || rules.some(r => !r.value)}
         onClick={handleSave}
       >
         {saving ? "Saving..." : "Save Campaign"}
       </button>
+
       {message && (
-        <div className="mt-2 text-sm text-red-500">{message}</div>
+        <div className="mt-3 text-sm text-red-600">{message}</div>
       )}
 
-      <div className="mb-3">
-        <label className="block font-medium mb-1">Campaign Objective (for AI suggestions)</label>
+      <div className="mt-6 mb-4">
+        <label className="block font-medium mb-1 text-gray-800">
+          Campaign Objective (for AI suggestions)
+        </label>
         <input
-          className="w-full border p-2 rounded"
+          className="w-full border border-gray-300 p-2 rounded text-gray-800 placeholder:text-gray-800"
           type="text"
           value={objective}
           onChange={e => setObjective(e.target.value)}
           placeholder="E.g., Bring back inactive users..."
         />
         <button
-          className="mt-2 bg-blue-600 text-white px-4 py-2 rounded"
+          className="mt-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
           disabled={!objective}
           onClick={async () => {
             setAiLoading(true); setAiError(''); setAiSuggestions([]);
@@ -228,9 +238,9 @@ function CreateCampaign() {
         >
           {aiLoading ? "Generating..." : "Suggest Messages"}
         </button>
-        {aiError && <div className="mt-2 text-sm text-red-500">{aiError}</div>}
+        {aiError && <div className="mt-2 text-sm text-red-600">{aiError}</div>}
         {aiSuggestions.length > 0 && (
-          <ul className="mt-2 bg-gray-100 rounded p-2">
+          <ul className="mt-2 bg-gray-100 rounded p-3 text-gray-800">
             {aiSuggestions.map((s, i) => (
               <li key={i} className="mb-2">{s}</li>
             ))}
