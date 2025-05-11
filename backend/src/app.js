@@ -10,7 +10,7 @@ const campaignRoutes = require('./routes/campaign');
 const vendorRoutes = require('./routes/vendor');
 const aiRoutes = require('./routes/ai');
 
-const authenticateJWT = require('./middleware/jwt');
+const authenticateJWT = require('./middleware/auth');
 
 const setupSwagger = require('./docs/swagger');
 
