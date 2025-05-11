@@ -11,7 +11,7 @@ export default function Login() {
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
       // Exchange Google credential for your own backend JWT
-      const res = await axios.post("/api/auth/google", {
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`, {
         credential: credentialResponse.credential,
       });
       localStorage.setItem("jwt_token", res.data.token); // Store your JWT!
