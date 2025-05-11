@@ -15,7 +15,7 @@ const sequelize = new Sequelize(
 const Customer = require('./customer')(sequelize);
 const Order = require('./order')(sequelize);
 const Campaign = require('./campaign')(sequelize);
-const CommunicationLog = require('./communicationLog')(sequelize);
+const CommunicationLog = require('./CommunicationLog')(sequelize);
 
 Customer.hasMany(Order, { foreignKey: 'customerId' });
 Order.belongsTo(Customer, { foreignKey: 'customerId' });

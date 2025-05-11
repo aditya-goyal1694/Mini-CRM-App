@@ -1,4 +1,6 @@
+"use client"
 import React, { useEffect, useState } from "react";
+import Link from 'next/link';
 import axios from "axios";
 
 export default function Campaigns() {
@@ -14,7 +16,7 @@ export default function Campaigns() {
           },
         });
         setCampaigns(res.data);
-      } catch (err) {
+      } catch {
         setCampaigns([]);
       } finally {
         setLoading(false);
@@ -52,12 +54,12 @@ export default function Campaigns() {
       )}
 
       <div className="mt-4">
-        <a
+        <Link
           href="/create-campaign"
           className="bg-indigo-600 text-white px-4 py-2 rounded"
         >
           + Create New Campaign
-        </a>
+        </Link>
       </div>
     </div>
   );
