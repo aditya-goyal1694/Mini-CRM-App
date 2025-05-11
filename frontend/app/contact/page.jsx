@@ -9,25 +9,21 @@ export default function Contact() {
         <div className="text-lg text-gray-600 font-medium mb-3 text-center">
           Built with ❤️ by <span className="font-bold text-indigo-700">Aditya Goyal</span>
         </div>
-        {/* Portfolio */}
         <ContactRow
           href="https://port-folio-two-flame.vercel.app/"
           label="Portfolio"
           Icon={FaExternalLinkAlt}
         />
-        {/* Github */}
         <ContactRow
           href="https://github.com/aditya-goyal1694"
           label="GitHub"
           Icon={FaGithub}
         />
-        {/* LinkedIn */}
         <ContactRow
           href="https://www.linkedin.com/in/aditya-goyal18/"
           label="LinkedIn"
           Icon={FaLinkedin}
         />
-        {/* Email */}
         <ContactRow
           href="mailto:adityamr.1694@gmail.com"
           label="adityamr.1694@gmail.com"
