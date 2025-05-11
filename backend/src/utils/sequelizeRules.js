@@ -1,4 +1,3 @@
-// src/utils/ruleToSequelize.js
 /**
  * Converts our JSON rule format into Sequelize WHERE options.
  * Supported operators: >, >=, <, <=, =, !=
