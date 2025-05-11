@@ -23,7 +23,11 @@ sequelize
 .catch((err) => console.error('Sequelize sync error:', err));
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: ['https://mini-crm-app-ten.vercel.app/'],
+  credentials: true,
+}));
+
 app.use(express.json());
 
 // API routes

@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 
+const BASE_URL = process.env.BACKEND_BASE_URL || 'http://localhost:8000';
+
 // Dummy Vendor API (simulates async, ~90% SENT, ~10% FAILED)
 router.post('/vendor', async (req, res) => {
   const { logId, customerId, message } = req.body;
@@ -11,7 +13,7 @@ router.post('/vendor', async (req, res) => {
     const status = isSuccess ? 'SENT' : 'FAILED';
 
     // Call delivery receipt API in your own backend
-    await axios.post('http://localhost:8000/dummy/receipt', {
+    await axios.post(`${BASE_URL}/dummy/receipt`, {
       logId,
       status,
     });

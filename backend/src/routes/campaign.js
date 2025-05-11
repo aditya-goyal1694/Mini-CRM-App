@@ -5,6 +5,8 @@ const sequelizeRules = require('../utils/sequelizeRules');
 const axios = require('axios');
 const { Op, fn, col, literal } = require("sequelize"); // <-- Added for aggregation
 
+const BASE_URL = process.env.BACKEND_BASE_URL || 'http://localhost:8000';
+
 const personalizeMessage = (customer, campaign) =>
   `Hi ${customer.name}, here’s 10% off on your next order! (Campaign: ${campaign.name})`;
 
@@ -36,7 +38,7 @@ router.post('/', async (req, res) => {
         delivery_status: 'PENDING'
       });
       // Call dummy vendor (simulate delivery)
-      axios.post('http://localhost:8000/dummy/vendor', {
+      axios.post(`${BASE_URL}/dummy/vendor`, {
         logId: log.id,
         customerId: customer.id,
         message,
