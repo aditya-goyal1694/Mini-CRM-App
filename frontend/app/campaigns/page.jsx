@@ -15,7 +15,11 @@ export default function Campaigns() {
             Authorization: `Bearer ${localStorage.getItem("jwt_token")}`,
           },
         });
-        setCampaigns(res.data);
+        // Sort most recent first
+        const sorted = [...res.data].sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        setCampaigns(sorted);
       } catch {
         setCampaigns([]);
       } finally {
@@ -40,6 +44,8 @@ export default function Campaigns() {
               <tr>
                 <th className="px-6 py-3 font-semibold">Name</th>
                 <th className="px-6 py-3 font-semibold">Audience Size</th>
+                <th className="px-6 py-3 font-semibold">Delivered</th>
+                <th className="px-6 py-3 font-semibold">Failed</th>
                 <th className="px-6 py-3 font-semibold">Created</th>
               </tr>
             </thead>
@@ -48,6 +54,8 @@ export default function Campaigns() {
                 <tr key={c.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-3">{c.name}</td>
                   <td className="px-6 py-3">{c.audience_size}</td>
+                  <td className="px-6 py-3">{c.sent_count ?? "-"}</td>
+                  <td className="px-6 py-3">{c.failed_count ?? "-"}</td>
                   <td className="px-6 py-3">{new Date(c.createdAt).toLocaleString()}</td>
                 </tr>
               ))}

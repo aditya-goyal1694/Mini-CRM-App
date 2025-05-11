@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useState } from "react";
 import axios from "axios";
 
@@ -79,6 +79,17 @@ function CreateCampaign() {
   };
 
   const handleSave = async () => {
+    // VALIDATION SECTION:
+    if (!campaignName.trim()) {
+      alert("Campaign name is required.");
+      return;
+    }
+    const missingValueIdx = rules.findIndex(r => r.value === "" || r.value === null || r.value === undefined);
+    if (missingValueIdx !== -1) {
+      alert("Each rule must have a value.");
+      return;
+    }
+
     setSaving(true);
     setMessage("");
     try {
@@ -194,7 +205,8 @@ function CreateCampaign() {
 
       <button
         className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded"
-        disabled={!campaignName || rules.some(r => !r.value)}
+        // You can remove disabled to allow clicking and just use alerts
+        // disabled={!campaignName || rules.some(r => !r.value && r.value !== 0)}
         onClick={handleSave}
       >
         {saving ? "Saving..." : "Save Campaign"}
