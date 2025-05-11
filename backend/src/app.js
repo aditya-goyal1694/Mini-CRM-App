@@ -24,7 +24,7 @@ sequelize
 
 const app = express();
 app.use(cors({
-  origin: ['https://mini-crm-app-ten.vercel.app/'],
+  origin: ['https://mini-crm-app-ten.vercel.app'],
   credentials: true,
 }));
 
