@@ -6,7 +6,16 @@ info:
 servers:
   - url: http://localhost:8000
 
+security:
+  - bearerAuth: []
+
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
     Customer:
       type: object
@@ -35,6 +44,7 @@ components:
         updatedAt:
           type: string
           format: date-time
+
     Order:
       type: object
       required:
@@ -60,7 +70,121 @@ components:
           type: string
           format: date-time
 
+    Campaign:
+      type: object
+      required:
+        - name
+        - rule
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        rule:
+          type: object
+        audience_size:
+          type: integer
+        sent_count:
+          type: integer
+        failed_count:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CommunicationLog:
+      type: object
+      properties:
+        id:
+          type: integer
+        campaign_id:
+          type: integer
+        customer_id:
+          type: integer
+        message:
+          type: string
+        delivery_status:
+          type: string
+          enum: [PENDING, SENT, FAILED]
+        vendor_reference:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    AIMessageSuggestion:
+      type: object
+      properties:
+        suggestions:
+          type: array
+          items:
+            type: string
+
+    SegmentPreview:
+      type: object
+      properties:
+        audience_size:
+          type: integer
+
+    JWTAuth:
+      type: object
+      properties:
+        token:
+          type: string
+
+    GoogleAuthRequest:
+      type: object
+      properties:
+        credential:
+          type: string
+
+    VendorDeliveryRequest:
+      type: object
+      properties:
+        logId:
+          type: integer
+        customerId:
+          type: integer
+        message:
+          type: string
+
+    VendorDeliveryReceipt:
+      type: object
+      properties:
+        logId:
+          type: integer
+        status:
+          type: string
+          enum: [SENT, FAILED]
+
 paths:
+  /api/auth/google:
+    post:
+      summary: Google OAuth2 login/signup
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GoogleAuthRequest'
+      responses:
+        200:
+          description: Successful authentication
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JWTAuth'
+        401:
+          description: Invalid Google token
+
   /api/customers:
     post:
       summary: Create a new customer
@@ -79,6 +203,8 @@ paths:
                 $ref: '#/components/schemas/Customer'
         400:
           description: Bad Request
+        409:
+          description: Customer already exists
     get:
       summary: Get all customers
       responses:
@@ -142,3 +268,129 @@ paths:
                   $ref: '#/components/schemas/Order'
         404:
           description: Customer not found
+
+  /api/segments/preview:
+    post:
+      summary: Preview segment audience size for a given rule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rule:
+                  type: object
+                  description: Segmentation rule in JSON format
+      responses:
+        200:
+          description: Segment audience size
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SegmentPreview'
+        400:
+          description: Missing rule
+        500:
+          description: Error evaluating rule
+
+  /api/campaigns:
+    post:
+      summary: Create a new campaign and send messages to its audience
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                rule:
+                  type: object
+      responses:
+        201:
+          description: Campaign created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Campaign'
+        400:
+          description: Both name and rule are required.
+    get:
+      summary: List campaigns, including sent and failed counts
+      responses:
+        200:
+          description: List of campaigns
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Campaign'
+
+  /api/ai/suggest-messages:
+    post:
+      summary: Suggest 3 catchy SMS messages using AI for a given campaign goal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                objective:
+                  type: string
+      responses:
+        200:
+          description: AI generated message suggestions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIMessageSuggestion'
+        400:
+          description: Objective is required
+        500:
+          description: Failed to fetch AI suggestions
+
+  /dummy/vendor:
+    post:
+      summary: Simulated vendor message delivery (dummy endpoint)
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VendorDeliveryRequest'
+      responses:
+        200:
+          description: Successfully queued
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  queued:
+                    type: boolean
+
+  /dummy/receipt:
+    post:
+      summary: Simulated vendor delivery receipt (dummy endpoint)
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VendorDeliveryReceipt'
+      responses:
+        200:
+          description: Delivery status updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  updated:
+                    type: boolean
