@@ -4,7 +4,8 @@ info:
   version: '1.0.0'
   description: API docs for Mini CRM
 servers:
-  - url: http://localhost:8000
+  - url: https://mini-crm-app-ten.vercel.app
+  - url: https://crm-backend-ycfo.onrender.com
 
 security:
   - bearerAuth: []
@@ -31,11 +32,14 @@ components:
           type: string
         phone:
           type: string
+          description: 10-15 digits, optional
+          pattern: '^\d{10,15}$'
         last_purchase_date:
           type: string
           format: date-time
         total_spend:
           type: number
+          format: float
         visits:
           type: integer
         createdAt:
@@ -57,6 +61,7 @@ components:
           type: integer
         amount:
           type: number
+          format: float
         order_date:
           type: string
           format: date-time
@@ -69,6 +74,14 @@ components:
         updatedAt:
           type: string
           format: date-time
+
+    OrderWithCustomer:
+      allOf:
+        - $ref: '#/components/schemas/Order'
+        - type: object
+          properties:
+            Customer:
+              $ref: '#/components/schemas/Customer'
 
     Campaign:
       type: object
@@ -86,8 +99,10 @@ components:
           type: integer
         sent_count:
           type: integer
+          description: Number of messages sent successfully
         failed_count:
           type: integer
+          description: Number of messages failed delivery
         createdAt:
           type: string
           format: date-time
@@ -141,12 +156,18 @@ components:
 
     GoogleAuthRequest:
       type: object
+      required:
+        - credential
       properties:
         credential:
           type: string
 
     VendorDeliveryRequest:
       type: object
+      required:
+        - logId
+        - customerId
+        - message
       properties:
         logId:
           type: integer
@@ -157,6 +178,9 @@ components:
 
     VendorDeliveryReceipt:
       type: object
+      required:
+        - logId
+        - status
       properties:
         logId:
           type: integer
@@ -168,7 +192,8 @@ paths:
   /api/auth/google:
     post:
       summary: Google OAuth2 login/signup
-      security: []
+      tags: [Auth]
+      security: []  # Public endpoint
       requestBody:
         required: true
         content:
@@ -188,12 +213,24 @@ paths:
   /api/customers:
     post:
       summary: Create a new customer
+      tags: [Customer]
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Customer'
+              type: object
+              required: [name, email]
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                phone:
+                  type: string
+                  pattern: '^\d{10,15}$'
       responses:
         201:
           description: Customer created
@@ -207,6 +244,9 @@ paths:
           description: Customer already exists
     get:
       summary: Get all customers
+      tags: [Customer]
+      security:
+        - bearerAuth: []
       responses:
         200:
           description: List of customers
@@ -220,12 +260,25 @@ paths:
   /api/orders:
     post:
       summary: Create a new order
+      tags: [Order]
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Order'
+              type: object
+              required: [customerId, amount]
+              properties:
+                customerId:
+                  type: integer
+                amount:
+                  type: number
+                  format: float
+                status:
+                  type: string
+                  enum: [PLACED, CANCELLED, FULFILLED]
       responses:
         201:
           description: Order created
@@ -235,21 +288,29 @@ paths:
                 $ref: '#/components/schemas/Order'
         400:
           description: Bad Request
+        404:
+          description: Customer not found
     get:
-      summary: Get all orders
+      summary: Get all orders (includes customer info)
+      tags: [Order]
+      security:
+        - bearerAuth: []
       responses:
         200:
-          description: List of orders
+          description: List of orders (each includes customer info)
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Order'
+                  $ref: '#/components/schemas/OrderWithCustomer'
 
   /api/orders/customer/{customerId}:
     get:
       summary: Get all orders for a specific customer
+      tags: [Order]
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: customerId
@@ -272,12 +333,16 @@ paths:
   /api/segments/preview:
     post:
       summary: Preview segment audience size for a given rule
+      tags: [Segments]
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
+              required: [rule]
               properties:
                 rule:
                   type: object
@@ -297,12 +362,16 @@ paths:
   /api/campaigns:
     post:
       summary: Create a new campaign and send messages to its audience
+      tags: [Campaign]
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
+              required: [name, rule]
               properties:
                 name:
                   type: string
@@ -319,9 +388,12 @@ paths:
           description: Both name and rule are required.
     get:
       summary: List campaigns, including sent and failed counts
+      tags: [Campaign]
+      security:
+        - bearerAuth: []
       responses:
         200:
-          description: List of campaigns
+          description: List of campaigns (with sent_count and failed_count)
           content:
             application/json:
               schema:
@@ -332,12 +404,15 @@ paths:
   /api/ai/suggest-messages:
     post:
       summary: Suggest 3 catchy SMS messages using AI for a given campaign goal
+      tags: [AI]
+      security: []  # Make public for AI-powered suggestion (per code logic)
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
+              required: [objective]
               properties:
                 objective:
                   type: string
@@ -356,6 +431,7 @@ paths:
   /dummy/vendor:
     post:
       summary: Simulated vendor message delivery (dummy endpoint)
+      tags: [Dummy]
       security: []
       requestBody:
         required: true
@@ -377,6 +453,7 @@ paths:
   /dummy/receipt:
     post:
       summary: Simulated vendor delivery receipt (dummy endpoint)
+      tags: [Dummy]
       security: []
       requestBody:
         required: true
