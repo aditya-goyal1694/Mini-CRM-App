@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 export default function Navbar() {
   const pathname = usePathname();
 
+  // Returns appropriate CSS classes based on the active path
   const linkClass = (href) =>
     `px-3 py-2 rounded font-medium transition ${
       pathname === href
@@ -17,8 +18,10 @@ export default function Navbar() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
 
-          {/* Logo/Home */}
-          <Link href="/" className="flex items-center gap-2 font-extrabold text-indigo-700 text-xl hover:text-indigo-900">
+          <Link
+            href="/"
+            className="flex items-center gap-2 font-extrabold text-indigo-700 text-xl hover:text-indigo-900"
+          >
             <span>Xeno CRM</span>
           </Link>
 

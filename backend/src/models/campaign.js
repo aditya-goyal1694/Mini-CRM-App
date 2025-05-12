@@ -10,18 +10,15 @@ module.exports = (sequelize) =>
         primaryKey: true,
       },
       name: {
-        // Name of campaign/segment
         type: DataTypes.STRING,
         allowNull: false,
       },
       rule: {
-        // Stores the JSON logic (as stringified JSON)
-        type: DataTypes.JSON,
+        type: DataTypes.JSON,   // Stores campaign rule logic as JSON
         allowNull: false,
       },
       audience_size: {
-        // Snapshot of audience size at creation
-        type: DataTypes.INTEGER,
+        type: DataTypes.INTEGER, // Audience size at creation time
         allowNull: false,
       },
       createdAt: {

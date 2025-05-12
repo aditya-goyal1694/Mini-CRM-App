@@ -3,41 +3,47 @@ const router = express.Router();
 const { Campaign, Customer, CommunicationLog } = require('../models');
 const sequelizeRules = require('../utils/sequelizeRules');
 const axios = require('axios');
-const { Op, fn, col, literal } = require("sequelize"); // <-- Added for aggregation
+const { Op, fn, col, literal } = require("sequelize");
 
 const BASE_URL = process.env.BACKEND_BASE_URL || 'http://localhost:8000';
 
+// Simple personalized message template
 const personalizeMessage = (customer, campaign) =>
   `Hi ${customer.name}, here’s 10% off on your next order! (Campaign: ${campaign.name})`;
 
+// Create a new campaign and trigger delivery
 router.post('/', async (req, res) => {
   try {
     const { name, rule } = req.body;
+
     if (!name || !rule) {
       return res.status(400).json({ message: 'Both name and rule are required.' });
     }
 
+    // Get audience matching the segmentation rule
     const where = sequelizeRules(rule);
     const audience = await Customer.findAll({ where });
     const audience_size = audience.length;
 
-    // Save campaign with rule and audience size
+    // Create and store the campaign
     const newCampaign = await Campaign.create({
       name,
       rule,
       audience_size
     });
 
-    // For each recipient, create log and initiate delivery (do NOT await all axios)
+    // For each audience member, create a log and simulate message delivery
     for (const customer of audience) {
       const message = personalizeMessage(customer, newCampaign);
+
       const log = await CommunicationLog.create({
         campaign_id: newCampaign.id,
         customer_id: customer.id,
         message,
         delivery_status: 'PENDING'
       });
-      // Call dummy vendor (simulate delivery)
+
+      // Simulate vendor delivery (fire and forget)
       axios.post(`${BASE_URL}/dummy/vendor`, {
         logId: log.id,
         customerId: customer.id,
@@ -51,24 +57,22 @@ router.post('/', async (req, res) => {
   }
 });
 
-// UPDATED GET /
-// This will include sent_count and failed_count with each campaign
+// Get campaigns (with sent/failed counts for each)
 router.get('/', async (req, res) => {
   try {
-    // Get all campaigns
+    // Fetch all campaigns
     const campaigns = await Campaign.findAll({
       order: [['createdAt', 'DESC']],
       raw: true
     });
 
     if (campaigns.length === 0) {
-      // No campaigns to report
       return res.json([]);
     }
 
     const campaignIds = campaigns.map(c => c.id);
 
-    // Get per-campaign sent/failed counts in bulk
+    // Bulk aggregation of sent/failed counts per campaign
     const logs = await CommunicationLog.findAll({
       attributes: [
         'campaign_id',
@@ -82,7 +86,7 @@ router.get('/', async (req, res) => {
       raw: true
     });
 
-    // Map stats by campaign_id for faster lookup
+    // Fast lookup by campaign_id
     const statsById = {};
     for (const row of logs) {
       statsById[row.campaign_id] = {
@@ -91,6 +95,7 @@ router.get('/', async (req, res) => {
       };
     }
 
+    // Merge stats into campaign data
     const campaignsWithStats = campaigns.map(c => ({
       ...c,
       sent_count: statsById[c.id]?.sent_count ?? 0,

@@ -28,6 +28,7 @@ export default function Home() {
           </Link>
         </div>
         <div className="mt-6 flex flex-col md:flex-row gap-4 w-full justify-center text-center">
+          {/* Feature cards */}
           <Card
             icon="🧑‍💼"
             title="Dynamic Segmentation"
@@ -77,7 +78,8 @@ export default function Home() {
   );
 }
 
-function Card({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string })  {
+// Simple feature card for main feature listing
+function Card({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
   return (
     <div className="flex-1 min-w-[240px] bg-white rounded-2xl shadow p-5 flex flex-col items-center border border-gray-100">
       <span className="text-3xl mb-2">{icon}</span>

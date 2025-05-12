@@ -8,6 +8,7 @@ export default function Campaigns() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Fetch campaigns from backend API with auth token
     async function fetchCampaigns() {
       try {
         const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/campaigns`, {
@@ -15,7 +16,7 @@ export default function Campaigns() {
             Authorization: `Bearer ${localStorage.getItem("jwt_token")}`,
           },
         });
-        // Sort most recent first
+        // Ensure most recent campaigns appear first
         const sorted = [...res.data].sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );

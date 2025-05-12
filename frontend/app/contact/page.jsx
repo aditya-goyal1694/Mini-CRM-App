@@ -1,6 +1,7 @@
 "use client";
 import { FaGithub, FaLinkedin, FaExternalLinkAlt, FaEnvelope } from "react-icons/fa";
 
+// Main Contact page component
 export default function Contact() {
   return (
     <main className="flex flex-col items-center justify-center min-h-[75vh] px-4 py-10">
@@ -9,6 +10,7 @@ export default function Contact() {
         <div className="text-lg text-gray-600 font-medium mb-3 text-center">
           Built with ❤️ by <span className="font-bold text-indigo-700">Aditya Goyal</span>
         </div>
+        {/* Contact methods */}
         <ContactRow
           href="https://port-folio-two-flame.vercel.app/"
           label="Portfolio"
@@ -34,12 +36,13 @@ export default function Contact() {
   );
 }
 
+// Row for each contact method. Reusable for different links.
 function ContactRow({ href, label, Icon }) {
   return (
     <a
       href={href}
       target="_blank"
-      rel="noopener noreferrer"
+      rel="noopener noreferrer" // Security best practice for external links
       className="flex items-center gap-3 w-full bg-indigo-50 hover:bg-indigo-100 transition px-4 py-3 rounded-xl mb-1"
     >
       <Icon className="text-indigo-700 text-xl" />

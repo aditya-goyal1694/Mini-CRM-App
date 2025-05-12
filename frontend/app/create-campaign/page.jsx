@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 
+// Candidate fields & operators for rule-building
 const fields = [
   { label: "Total Spend (₹)", value: "total_spend" },
   { label: "Visits", value: "visits" },
@@ -18,20 +19,23 @@ const operators = [
 ];
 
 function CreateCampaign() {
+  // Main local state for form and async feedback
   const [campaignName, setCampaignName] = useState("");
   const [rules, setRules] = useState([
     { field: "total_spend", operator: ">", value: "" },
   ]);
-  const [logicType, setLogicType] = useState("and");
+  const [logicType, setLogicType] = useState("and"); // "and" or "or" between rules
   const [audienceSize, setAudienceSize] = useState(null);
-  const [saving, setSaving] = useState(false);
+  const [saving, setSaving] = useState(false); // For UX feedback
   const [message, setMessage] = useState("");
 
+  // State for AI message suggestions based on campaign objective
   const [objective, setObjective] = useState('');
   const [aiSuggestions, setAiSuggestions] = useState([]);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState('');
 
+  // ------ Rule list editing ------
   const handleRuleChange = (idx, key, value) => {
     const updated = [...rules];
     updated[idx][key] = value;
@@ -46,6 +50,7 @@ function CreateCampaign() {
     setRules(rules.filter((_, i) => i !== idx));
   };
 
+  // Generate the rule tree payload for API
   const buildRuleTree = () => {
     return {
       [logicType]: rules.map((r) => ({
@@ -56,12 +61,14 @@ function CreateCampaign() {
     };
   };
 
+  // Auth header for API calls
   const getAuthHeader = () => ({
     headers: {
       Authorization: `Bearer ${localStorage.getItem("jwt_token")}`,
     },
   });
 
+  // Preview audience by sending rules to backend
   const handlePreview = async () => {
     try {
       setAudienceSize(null);
@@ -78,13 +85,16 @@ function CreateCampaign() {
     }
   };
 
+  // Save campaign to backend, with client-side basic validation
   const handleSave = async () => {
-    // VALIDATION SECTION:
+    // --- Validation: Required fields ---
     if (!campaignName.trim()) {
       alert("Campaign name is required.");
       return;
     }
-    const missingValueIdx = rules.findIndex(r => r.value === "" || r.value === null || r.value === undefined);
+    const missingValueIdx = rules.findIndex(
+      r => r.value === "" || r.value === null || r.value === undefined
+    );
     if (missingValueIdx !== -1) {
       alert("Each rule must have a value.");
       return;
@@ -104,6 +114,7 @@ function CreateCampaign() {
       );
       setSaving(false);
       setMessage("Campaign saved!");
+      // Redirect after save
       setTimeout(() => {
         window.location.href = "/campaigns";
       }, 1000);
@@ -117,6 +128,7 @@ function CreateCampaign() {
     <div className="max-w-2xl mx-auto mt-10 p-6 bg-white rounded-2xl shadow-md">
       <h2 className="text-3xl font-bold mb-6 text-gray-900">Create Campaign</h2>
 
+      {/* Campaign Name Input */}
       <div className="mb-4">
         <label className="block font-medium mb-1 text-gray-800">Campaign Name</label>
         <input
@@ -128,6 +140,7 @@ function CreateCampaign() {
         />
       </div>
 
+      {/* Rule Logic Selector */}
       <div className="mb-4">
         <label className="block font-medium mb-1 text-gray-800">Segment Logic</label>
         <select
@@ -143,6 +156,7 @@ function CreateCampaign() {
         </span>
       </div>
 
+      {/* Rules List */}
       {rules.map((rule, idx) => (
         <div key={idx} className="flex flex-wrap gap-2 mb-2 items-center">
           <select
@@ -180,6 +194,7 @@ function CreateCampaign() {
         </div>
       ))}
 
+      {/* Add another rule */}
       <button
         type="button"
         className="mb-4 px-3 py-2 bg-blue-100 border border-blue-400 rounded text-sm text-gray-800"
@@ -188,6 +203,7 @@ function CreateCampaign() {
         + Add Rule
       </button>
 
+      {/* Audience preview */}
       <div className="mb-4">
         <button
           type="button"
@@ -203,10 +219,9 @@ function CreateCampaign() {
         )}
       </div>
 
+      {/* Save button */}
       <button
         className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded"
-        // You can remove disabled to allow clicking and just use alerts
-        // disabled={!campaignName || rules.some(r => !r.value && r.value !== 0)}
         onClick={handleSave}
       >
         {saving ? "Saving..." : "Save Campaign"}
@@ -216,6 +231,7 @@ function CreateCampaign() {
         <div className="mt-3 text-sm text-red-600">{message}</div>
       )}
 
+      {/* AI suggestion block */}
       <div className="mt-6 mb-4">
         <label className="block font-medium mb-1 text-gray-800">
           Campaign Objective (for AI suggestions)

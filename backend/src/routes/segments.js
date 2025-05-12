@@ -3,12 +3,6 @@ const router = express.Router();
 const { Customer } = require('../models');
 const sequelizeRules = require('../utils/sequelizeRules');
 
-/**
- * POST /api/segments/preview
- * Body: { rule }
- * Returns: { audience_size }
- */
-
 router.post('/preview', async (req, res) => {
   try {
     const { rule } = req.body;
@@ -16,7 +10,7 @@ router.post('/preview', async (req, res) => {
       return res.status(400).json({ message: 'Missing rule in body.' });
     }
 
-    // Convert rule into Sequelize where clause
+    // Convert rule to Sequelize where clause for filtering customers
     const where = sequelizeRules(rule);
     const audience_size = await Customer.count({ where });
 

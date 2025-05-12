@@ -3,20 +3,21 @@ const router = express.Router();
 const { Order, Customer } = require('../models');
 const { orderSchema } = require('../validators/order');
 
-// POST /api/orders — Create a new order for a customer
+// Create a new order for a customer
 router.post('/', async (req, res) => {
   try {
-    // Validate input
+    // Validate request body
     const { error, value } = orderSchema.validate(req.body);
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
     }
-    // Check if customer exists
+
+    // Ensure customer exists
     const customer = await Customer.findByPk(value.customerId);
     if (!customer) {
       return res.status(404).json({ message: 'Customer not found.' });
     }
-    // Create Order; order_date auto-set
+
     const order = await Order.create(value);
     return res.status(201).json(order);
   } catch (err) {
@@ -24,7 +25,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-// GET /api/orders — List all orders including related customer
+// List all orders with related customer info
 router.get('/', async (req, res) => {
   try {
     const orders = await Order.findAll({
@@ -36,7 +37,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET /api/orders/customer/:customerId — List orders for one customer
+// List all orders for a specific customer
 router.get('/customer/:customerId', async (req, res) => {
   try {
     const orders = await Order.findAll({

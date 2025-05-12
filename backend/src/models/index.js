@@ -1,6 +1,7 @@
 const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
+// Initialize Sequelize connection with environment credentials
 const sequelize = new Sequelize(
   process.env.DB_NAME,
   process.env.DB_USER,
@@ -13,11 +14,13 @@ const sequelize = new Sequelize(
   }
 );
 
+// Model imports
 const Customer = require('./customer')(sequelize);
 const Order = require('./order')(sequelize);
 const Campaign = require('./campaign')(sequelize);
 const CommunicationLog = require('./communicationLog')(sequelize);
 
+// Model associations
 Customer.hasMany(Order, { foreignKey: 'customerId' });
 Order.belongsTo(Customer, { foreignKey: 'customerId' });
 

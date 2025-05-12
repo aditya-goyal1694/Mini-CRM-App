@@ -8,14 +8,17 @@ export default function Login() {
   const [loginError, setLoginError] = useState(null);
   const router = useRouter();
 
+  // On successful Google login, exchange Google's credential for your app's JWT
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
-      // Exchange Google credential for your own backend JWT
-      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`, {
-        credential: credentialResponse.credential,
-      });
-      localStorage.setItem("jwt_token", res.data.token); // Store your JWT!
-      router.push("/create-campaign");
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`,
+        {
+          credential: credentialResponse.credential,
+        }
+      );
+      localStorage.setItem("jwt_token", res.data.token); // Store JWT for subsequent API calls
+      router.push("/create-campaign"); // Redirect on success
     } catch (err) {
       setLoginError("Login failed: " + (err.response?.data?.message || err.message));
     }
@@ -28,6 +31,7 @@ export default function Login() {
         onSuccess={handleGoogleSuccess}
         onError={() => setLoginError("Google Login Failed")}
       />
+      {/* Show error if login fails */}
       {loginError && <p className="text-red-500 mt-3">{loginError}</p>}
     </div>
   );
