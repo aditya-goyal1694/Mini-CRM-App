@@ -9,7 +9,7 @@ const segmentsRoutes = require('./routes/segments');
 const campaignRoutes = require('./routes/campaign');
 const vendorRoutes = require('./routes/vendor');
 const aiRoutes = require('./routes/ai');
-const authenticateJWT = require('./middleware/auth');
+const authenticateJWT = require('./middleware/jwt');
 const setupSwagger = require('./docs/swagger');
 const { sequelize } = require('./models');
 
