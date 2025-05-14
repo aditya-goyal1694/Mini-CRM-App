@@ -19,6 +19,12 @@ router.post('/', async (req, res) => {
     }
 
     const order = await Order.create(value);
+
+    // Update customer's data
+    await customer.increment('visits');
+    await customer.increment('total_spend', { by: value.amount });
+    await customer.update({ last_purchase_date: order.order_date });
+
     return res.status(201).json(order);
   } catch (err) {
     return res.status(500).json({ message: 'Error creating order', error: err.message });
