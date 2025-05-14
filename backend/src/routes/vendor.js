@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 
-const BASE_URL = process.env.BACKEND_BASE_URL || 'http://localhost:8000';
+const BASE_URL = 'https://crm-backend-ycfo.onrender.com';
 
 // Simulate vendor message delivery (async, ~90% success)
 router.post('/vendor', async (req, res) => {

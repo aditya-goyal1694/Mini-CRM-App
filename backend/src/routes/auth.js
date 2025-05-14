@@ -12,6 +12,7 @@ router.post('/google', async (req, res) => {
 
   try {
     // Verify Google credential
+    console.log("Received credential:", credential);
     const ticket = await client.verifyIdToken({
       idToken: credential,
       audience: CLIENT_ID,

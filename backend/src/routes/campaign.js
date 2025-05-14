@@ -5,7 +5,7 @@ const sequelizeRules = require('../utils/sequelizeRules');
 const axios = require('axios');
 const { Op, fn, col, literal } = require("sequelize");
 
-const BASE_URL = process.env.BACKEND_BASE_URL || 'http://localhost:8000';
+const BASE_URL = 'https://crm-backend-ycfo.onrender.com';
 
 // Simple personalized message template
 const personalizeMessage = (customer, campaign) =>

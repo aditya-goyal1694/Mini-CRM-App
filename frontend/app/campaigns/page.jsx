@@ -11,7 +11,7 @@ export default function Campaigns() {
     // Fetch campaigns from backend API with auth token
     async function fetchCampaigns() {
       try {
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/campaigns`, {
+        const res = await axios.get("https://crm-backend-ycfo.onrender.com/api/campaigns", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("jwt_token")}`,
           },

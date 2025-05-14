@@ -50,5 +50,5 @@ app.get('/', (req, res) => res.send("Mini CRM API is running."));
 const port = process.env.PORT || 8000;
 
 app.listen(port, () => {
-  console.log(`Server running on render port:${port}`);
+  console.log(`Server running on Render, port:${port}`);
 });

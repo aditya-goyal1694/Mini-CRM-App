@@ -75,7 +75,7 @@ function CreateCampaign() {
       setMessage("");
       const ruleTree = buildRuleTree();
       const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/segments/preview`,
+        "https://crm-backend-ycfo.onrender.com/api/segments/preview",
         { rule: ruleTree },
         getAuthHeader()
       );
@@ -105,7 +105,7 @@ function CreateCampaign() {
     try {
       const ruleTree = buildRuleTree();
       await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/campaigns`,
+        "https://crm-backend-ycfo.onrender.com/api/campaigns",
         {
           name: campaignName,
           rule: ruleTree,
@@ -250,7 +250,7 @@ function CreateCampaign() {
             setAiLoading(true); setAiError(''); setAiSuggestions([]);
             try {
               const res = await axios.post(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/ai/suggest-messages`,
+                "https://crm-backend-ycfo.onrender.com/api/ai/suggest-messages",
                 { objective },
                 {
                   headers: { Authorization: `Bearer ${localStorage.getItem("jwt_token")}` }

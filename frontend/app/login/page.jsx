@@ -12,7 +12,7 @@ export default function Login() {
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
       const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`,
+        "https://crm-backend-ycfo.onrender.com/api/auth/google",
         {
           credential: credentialResponse.credential,
         }
