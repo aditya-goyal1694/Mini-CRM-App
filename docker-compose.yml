@@ -12,6 +12,26 @@ services:
     depends_on:
       - frontend
 
+  consumer-ingest:
+    build: ./backend
+    command: ["node", "src/consumers/ingestConsumer.js"]
+    env_file:
+      - ./backend/.env
+    networks:
+      - crm-net
+    depends_on:
+      - backend
+
+  consumer-receipts:
+    build: ./backend
+    command: ["node", "src/consumers/receiptConsumer.js"]
+    env_file:
+      - ./backend/.env
+    networks:
+      - crm-net
+    depends_on:
+      - backend
+
   frontend:
     build: ./frontend
     ports:
