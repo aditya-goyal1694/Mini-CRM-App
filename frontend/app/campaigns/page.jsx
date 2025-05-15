@@ -7,32 +7,46 @@ export default function Campaigns() {
   const [campaigns, setCampaigns] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Fetch campaigns from backend API with auth token
-    async function fetchCampaigns() {
-      try {
-        const res = await axios.get("https://crm-backend-ycfo.onrender.com/api/campaigns", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("jwt_token")}`,
-          },
-        });
-        // Ensure most recent campaigns appear first
-        const sorted = [...res.data].sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-        );
-        setCampaigns(sorted);
-      } catch {
-        setCampaigns([]);
-      } finally {
-        setLoading(false);
-      }
+  // Moved fetch function out, so it can be used by button
+  const fetchCampaigns = async () => {
+    setLoading(true); // Show loading while fetching
+    try {
+      const res = await axios.get("https://crm-backend-ycfo.onrender.com/api/campaigns", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwt_token")}`,
+        },
+      });
+      // Most recent first
+      const sorted = [...res.data].sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+      setCampaigns(sorted);
+    } catch {
+      setCampaigns([]);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  // Initial load
+  useEffect(() => {
     fetchCampaigns();
+    // eslint-disable-next-line
   }, []);
 
   return (
     <div className="max-w-4xl mx-auto mt-10 px-6 py-8 bg-white rounded-2xl shadow-md border border-gray-200">
-      <h2 className="text-3xl font-bold text-gray-900 mb-6">📊 Campaign History</h2>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-3xl font-bold text-gray-900">📊 Campaign History</h2>
+        {/* Refresh button */}
+        <button
+          onClick={fetchCampaigns}
+          className="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600 transition disabled:opacity-50"
+          disabled={loading}
+        >
+          {loading ? "Refreshing..." : "Refresh"}
+        </button>
+      </div>
 
       {loading ? (
         <div className="text-gray-600">Loading...</div>
@@ -72,6 +86,12 @@ export default function Campaigns() {
         >
           + Create New Campaign
         </Link>
+      </div>
+
+      <div className="mt-4">
+        <span className="text-xs text-gray-500">
+          Stats update shortly after campaign creation. Click "Refresh" to see the latest.
+        </span>
       </div>
     </div>
   );
