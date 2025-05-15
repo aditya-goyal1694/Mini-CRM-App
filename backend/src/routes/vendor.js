@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
+const redis = require('../utils/redis');
 
 const BASE_URL = 'https://crm-backend-ycfo.onrender.com';
 
@@ -25,14 +26,13 @@ router.post('/vendor', async (req, res) => {
 // Update delivery status for communication log
 router.post('/receipt', async (req, res) => {
   const { logId, status } = req.body;
-  const { CommunicationLog } = require('../models');
-
-  await CommunicationLog.update(
-    { delivery_status: status },
-    { where: { id: logId } }
-  );
-
-  res.json({ updated: true });
+  // Enqueue for async update, don't update DB directly
+  await redis.xAdd('receipts_stream', '*', {
+    logId: String(logId),
+    status: status
+  });
+  res.json({ updated: true, enqueued: true });
 });
+
 
 module.exports = router;

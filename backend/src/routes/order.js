@@ -2,32 +2,20 @@ const express = require('express');
 const router = express.Router();
 const { Order, Customer } = require('../models');
 const { orderSchema } = require('../validators/order');
+const redis = require('../utils/redis');
 
 // Create a new order for a customer
 router.post('/', async (req, res) => {
+  const { error, value } = orderSchema.validate(req.body);
+  if (error) return res.status(400).json({ message: error.details[0].message });
+
   try {
-    // Validate request body
-    const { error, value } = orderSchema.validate(req.body);
-    if (error) {
-      return res.status(400).json({ message: error.details[0].message });
-    }
-
-    // Ensure customer exists
-    const customer = await Customer.findByPk(value.customerId);
-    if (!customer) {
-      return res.status(404).json({ message: 'Customer not found.' });
-    }
-
-    const order = await Order.create(value);
-
-    // Update customer's data
-    await customer.increment('visits');
-    await customer.increment('total_spend', { by: value.amount });
-    await customer.update({ last_purchase_date: order.order_date });
-
-    return res.status(201).json(order);
+    await redis.xAdd('orders_stream', '*', {
+      data: JSON.stringify(value)
+    });
+    return res.status(202).json({ accepted: true });
   } catch (err) {
-    return res.status(500).json({ message: 'Error creating order', error: err.message });
+    return res.status(500).json({ message: 'Error queuing order', error: err.message });
   }
 });
 

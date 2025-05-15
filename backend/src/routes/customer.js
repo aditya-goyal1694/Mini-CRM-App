@@ -2,23 +2,26 @@ const express = require('express');
 const router = express.Router();
 const { Customer } = require('../models');
 const { customerSchema } = require('../validators/customer');
+const redis = require('../utils/redis');
 
 // Create a new customer
 router.post('/', async (req, res) => {
-  try {
-    // Validate request body with Joi schema
-    const { error, value } = customerSchema.validate(req.body);
-    if (error) {
-      return res.status(400).json({ message: error.details[0].message });
-    }
+  // Validate request body
+  const { error, value } = customerSchema.validate(req.body);
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
 
-    const newCustomer = await Customer.create(value);
-    return res.status(201).json(newCustomer);
+  // Instead of direct DB insert, push to Redis stream for async persistence
+  try {
+    await redis.xAdd('customers_stream', '*', {
+      data: JSON.stringify(value)
+    });
+    
+    // Return acceptance response
+    return res.status(202).json({ accepted: true });
   } catch (err) {
-    if (err.name === 'SequelizeUniqueConstraintError') {
-      return res.status(409).json({ message: 'Customer with this email already exists.' });
-    }
-    return res.status(500).json({ message: 'Error creating customer', error: err.message });
+    return res.status(500).json({ message: 'Error queuing customer', error: err.message });
   }
 });
 
