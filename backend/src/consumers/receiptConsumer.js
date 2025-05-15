@@ -10,16 +10,26 @@ async function processReceipts() {
     if (res) {
       const updates = [];
       for (const msg of res[0].messages) {
-        const { logId, status } = msg.message;
+        let logId, status;
+        if (msg.message.data) {
+          ({ logId, status } = JSON.parse(msg.message.data));
+        } else {
+          ({ logId, status } = msg.message);
+        }
         updates.push({ logId, status });
         lastId = msg.id;
       }
       // Batch update the DB
       for (const { logId, status } of updates) {
-        await CommunicationLog.update(
-          { delivery_status: status },
-          { where: { id: logId } }
-        );
+        console.log(`[ReceiptConsumer] Updating logId=${logId} to status=${status}`);
+        try {
+          await CommunicationLog.update(
+            { delivery_status: status },
+            { where: { id: logId } }
+          );
+        } catch (e) {
+          console.error('update error', e);
+        }
       }
     }
   }
