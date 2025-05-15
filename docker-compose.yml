@@ -11,6 +11,7 @@ services:
       - crm-net
     depends_on:
       - frontend
+    restart: unless-stopped
 
   consumer-ingest:
     build: ./backend
@@ -21,6 +22,7 @@ services:
       - crm-net
     depends_on:
       - backend
+    restart: unless-stopped
 
   consumer-receipts:
     build: ./backend
@@ -31,6 +33,7 @@ services:
       - crm-net
     depends_on:
       - backend
+    restart: unless-stopped
 
   frontend:
     build: ./frontend
@@ -38,6 +41,7 @@ services:
       - "3000:3000"
     networks:
       - crm-net
+    restart: unless-stopped
 
 networks:
   crm-net:
