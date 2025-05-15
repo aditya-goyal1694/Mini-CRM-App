@@ -27,8 +27,25 @@ async function processOrders() {
       for (const msg of res[0].messages) {
         const data = JSON.parse(msg.message.data);
         try {
-          await Order.create(data);
-        } catch (e) { }
+          // 1. Create the order
+          const order = await Order.create(data);
+
+          // 2. Find customer and update aggregation data
+          if (order && order.customerId) {
+            // Use transaction if needed for strict consistency
+            await Customer.increment(
+              { visits: 1, total_spend: order.amount },
+              { where: { id: order.customerId } }
+            );
+            // Set last_purchase_date to order_date
+            await Customer.update(
+              { last_purchase_date: order.order_date },
+              { where: { id: order.customerId } }
+            );
+          }
+        } catch (e) {
+          console.error('Order consumer error:', e);
+        }
         lastId = msg.id;
       }
     }
