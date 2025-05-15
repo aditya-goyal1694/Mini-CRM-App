@@ -194,7 +194,7 @@ paths:
     post:
       summary: Google OAuth2 login/signup
       tags: [Auth]
-      security: []   # No authentication required
+      security: []
       requestBody:
         required: true
         content:
@@ -213,7 +213,8 @@ paths:
 
   /api/customers:
     post:
-      summary: Create a new customer
+      summary: Create a new customer (async)
+      description: Enqueues customer creation for background processing.
       tags: [Customer]
       security:
         - bearerAuth: []
@@ -233,16 +234,17 @@ paths:
                   type: string
                   pattern: '^\d{10,15}$'
       responses:
-        201:
-          description: Customer created
+        202:
+          description: Customer creation accepted for async processing (queued)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Customer'
+                type: object
+                properties:
+                  accepted:
+                    type: boolean
         400:
           description: Bad Request
-        409:
-          description: Customer already exists
 
     get:
       summary: Get all customers
@@ -261,7 +263,8 @@ paths:
 
   /api/orders:
     post:
-      summary: Create a new order
+      summary: Create a new order (async)
+      description: Enqueues order creation for background processing.
       tags: [Order]
       security:
         - bearerAuth: []
@@ -282,16 +285,17 @@ paths:
                   type: string
                   enum: [PLACED, CANCELLED, FULFILLED]
       responses:
-        201:
-          description: Order created
+        202:
+          description: Order creation accepted for async processing (queued)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
+                type: object
+                properties:
+                  accepted:
+                    type: boolean
         400:
           description: Bad Request
-        404:
-          description: Customer not found
 
     get:
       summary: Get all orders (includes customer info)
@@ -409,7 +413,7 @@ paths:
     post:
       summary: Suggest 3 catchy SMS messages using AI for a given campaign goal
       tags: [AI]
-      security: []   # No authentication required
+      security: []
       requestBody:
         required: true
         content:
