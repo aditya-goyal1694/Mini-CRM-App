@@ -34,8 +34,9 @@ Segment your audiences, deliver personalized campaigns, and unlock AI-powered in
             |                              |--[ Redis Streams (pub/sub) consumers ]
       End User (browser)                   |
       |-> Customer ingest                  |
-      |-> Order ingest                    |
-      |-> Delivery Receipt ingest         |
+      |-> Order ingest                     |
+      |-> Delivery Receipt ingest          |
+                                           |
                               [ MySQL Database (Railway) ]
 ```
 
