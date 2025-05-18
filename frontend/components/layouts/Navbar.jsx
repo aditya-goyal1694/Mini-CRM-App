@@ -22,7 +22,7 @@ export default function Navbar() {
             href="/"
             className="flex items-center gap-2 font-extrabold text-indigo-700 text-xl hover:text-indigo-900"
           >
-            <span>Xeno CRM</span>
+            <span>Mini CRM</span>
           </Link>
 
           <div className="flex space-x-1 md:space-x-4">

@@ -14,7 +14,7 @@ router.post('/suggest-messages', async (req, res) => {
   }
 
   try {
-    const businessName = "Xeno-CRM";
+    const businessName = "Mini-CRM";
     const prompt = `
       Write 3 catchy, friendly SMS messages for this campaign goal: "${objective}".
       The app/service is called "${businessName}".
